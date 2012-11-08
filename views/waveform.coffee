@@ -3,6 +3,7 @@ window.Waveform = class Waveform
     @container = options.container
     @canvas    = options.canvas
     @data      = options.data || []
+    @drawData  = options.drawData || []
     @outerColor = options.outerColor || "transparent"
     @innerColor = options.innerColor || "#000000"
     @interpolate = true
@@ -25,18 +26,20 @@ window.Waveform = class Waveform
     @data = data
 
   setDataInterpolated: (data) ->
-    @setData @interpolateArray(data, @width)
+    @drawData = @interpolateArray(data, @width)
 
   setDataCropped: (data) ->
-    @setData @expandArray(data, @width)
+    @drawData = @expandArray(data, @width)
 
   update: (options) ->
+    if options.hasOwnProperty 'data'
+      @data = options.data
     if options.interpolate?
       @interpolate = options.interpolate
     if @interpolate == false
-      @setDataCropped(options.data)
+      @setDataCropped(@data)
     else
-      @setDataInterpolated(options.data)
+      @setDataInterpolated(@data)
     @redraw()
 
   redraw: () =>
@@ -44,8 +47,8 @@ window.Waveform = class Waveform
     @context.fillStyle = @innerColor
     middle = @height / 2
     i = 0
-    for d in @data
-      t = @width / @data.length
+    for d in @drawData
+      t = @width / @drawData.length
       @context.fillStyle = @innerColor(i/@width, d) if typeof(@innerColor) == "function"
       @context.clearRect t*i, middle - middle * d, t, (middle * d * 2)
       @context.fillRect t*i, middle - middle * d, t, middle * d * 2
