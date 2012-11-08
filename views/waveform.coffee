@@ -150,11 +150,12 @@ JSONP = (->
     for key of params
       query += encode(key) + "=" + encode(params[key]) + "&"  if params.hasOwnProperty(key)
     jsonp = "json" + (++counter)
+    localjsonp = jsonp
     window[jsonp] = (data) ->
       callback data
+      window[localjsonp] = null
       try
-        delete window[jsonp]
-      window[jsonp] = null
+        delete window[localjsonp]
 
     load url + query + (callbackName or config["callbackName"] or "callback") + "=" + jsonp
     jsonp
